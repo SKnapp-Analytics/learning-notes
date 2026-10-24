@@ -160,3 +160,9 @@ HAVING constriant_expression
 ORDER BY column ASC / DESC
 LIMIT num_limit OFFSET num_offset
 
+-- Claude review question:
+-- Q: Why can you use a column alias in ORDER BY but not in WHERE?
+-- A: The alias is created in SELECT.  Here is the order of execution:
+-- FROM/JOIN -> WHERE -> GROUP BY -> HAVING -> SELECT -> DISTINCT -> ORDER BY -> LIMIT
+-- The alias hasn't been created when WHERE is run, but has been by ORDER BY.
+
