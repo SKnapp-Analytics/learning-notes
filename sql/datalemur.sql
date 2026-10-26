@@ -73,3 +73,18 @@ WHERE t.status = 'Completed'
 GROUP BY u.city
 ORDER BY total_orders DESC
 LIMIT 3;
+
+-- Amazon: Average Review Ratings
+
+SELECT 
+  EXTRACT(MONTH FROM submit_date) AS mth,
+  product_id AS product,
+  ROUND(AVG(stars), 2) AS avg_stars
+FROM reviews
+GROUP BY EXTRACT(MONTH FROM submit_date), product_id
+ORDER BY mth, product;
+
+-- GROUP BY occurs before SELECT in the order of execution.  Some SQL servers follow it strictly
+-- some allow aliases in GROUP BY, but safer to use full syntax
+
+-- FROM / JOIN → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT
