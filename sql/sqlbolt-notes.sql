@@ -166,3 +166,49 @@ LIMIT num_limit OFFSET num_offset
 -- FROM/JOIN -> WHERE -> GROUP BY -> HAVING -> SELECT -> DISTINCT -> ORDER BY -> LIMIT
 -- The alias hasn't been created when WHERE is run, but has been by ORDER BY.
 
+-- LESSON 13: Inserting rows
+
+INSERT INTO boxoffice 
+VALUES (4, 8.7, 340000000, 270000000);
+
+-- LESSON 14: Updating Rows
+
+UPDATE movies
+SET director = "John Lasseter"
+WHERE id = 2;
+
+UPDATE movies
+SET Year = 1999
+WHERE Id = 3;
+
+UPDATE movies
+SET director = 'Lee Unkrich',
+    title = 'Toy Story 3'
+WHERE Id = 11;
+
+-- LESSON 15: Deleting Rows
+
+DELETE FROM movies
+WHERE Year < 2005;
+
+-- LESSON 16: Creating tables
+
+CREATE TABLE IF NOT EXISTS Database(
+    id INTEGER PRIMARY KEY,
+    Name TEXT,
+    Version FLOAT,
+    Download_count INTEGER
+);
+
+-- Lesson 17: Altering tables
+
+ALTER TABLE movies
+ADD Aspect_ratio FLOAT;
+
+ALTER TABLE movies
+ADD Language TEXT DEFAULT 'English';
+
+-- Lesson 18: Dropping tables
+
+DROP TABLE IF EXISTS boxoffice;
+
