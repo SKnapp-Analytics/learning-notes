@@ -51,3 +51,25 @@ SELECT
     THEN user_id 
     END) AS mobile_views
 FROM viewership;
+
+-- LinkedIn - Duplicate job listings
+
+WITH dup_listings AS (
+  SELECT company_id, title, description, count(*)
+  FROM job_listings
+  GROUP BY company_id, title, description
+  HAVING count(*) > 1
+)
+  SELECT count(DISTINCT company_id) AS duplicate_companies
+  FROM dup_listings;
+
+-- RobinHood - Cities with Completed Trades
+
+SELECT city, count(*) AS total_orders
+FROM trades AS t
+JOIN users AS u
+  ON t.user_id = u.user_id
+WHERE t.status = 'Completed'
+GROUP BY u.city
+ORDER BY total_orders DESC
+LIMIT 3;
