@@ -167,3 +167,41 @@ SELECT
 FROM artist_ranked
 WHERE artist_rank <= 5
 ORDER BY artist_rank;
+
+
+--WALMART - Histogram of Users and Purchases
+
+WITH purchase_totals AS (
+  SELECT
+    user_id,
+    transaction_date,
+    COUNT(*) OVER(
+      PARTITION BY user_id, transaction_date) AS purchase_count,
+    ROW_NUMBER() OVER(
+      PARTITION BY user_id ORDER BY transaction_date DESC) AS date_rank
+  FROM user_transactions)
+  
+SELECT
+  transaction_date,
+  user_id,
+  purchase_count
+FROM purchase_totals
+WHERE date_rank = 1
+ORDER BY transaction_date;
+
+--Google Odd Even Measurements
+
+WITH time_measurements AS (
+  SELECT 
+    DATE(measurement_time) AS measurement_day,
+    measurement_value,
+    ROW_NUMBER() OVER(
+    PARTITION BY DATE(measurement_time) ORDER BY measurement_time) AS time_rank
+  FROM measurements)
+SELECT
+  measurement_day,
+  SUM(CASE WHEN time_rank % 2 = 1 THEN measurement_value END) AS odd_sum,
+  SUM(CASE WHEN time_rank % 2 = 0 THEN measurement_value END) AS even_sum
+FROM time_measurements
+GROUP BY measurement_day
+ORDER BY measurement_day;
