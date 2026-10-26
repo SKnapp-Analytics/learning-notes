@@ -114,3 +114,56 @@ WITH app_counts AS (
     app_id,
     ROUND(100.0 * clicks / NULLIF(impressions, 0), 2) AS ctr
   FROM app_counts
+
+-- Twitter Tweets' Rolling Averages
+
+SELECT 
+  user_id,
+  tweet_date,
+  ROUND(AVG(tweet_count) OVER(
+    PARTITION BY user_id
+    ORDER BY tweet_date
+    RANGE BETWEEN INTERVAL '2 days' PRECEDING AND CURRENT ROW), 2) AS rolling_avg_3d
+FROM tweets
+ORDER BY user_id, tweet_date;
+
+-- JP Morgan Card Launch Success
+
+WITH launch_data AS (
+  SELECT
+    card_name,
+    ROW_NUMBER() OVER(
+      PARTITION BY card_name
+      ORDER BY issue_year, issue_month
+      ) AS rn, 
+    issued_amount
+  FROM monthly_cards_issued
+)
+SELECT 
+  card_name,
+  issued_amount
+FROM launch_data
+WHERE rn = 1 
+ORDER BY issued_amount DESC;
+
+--Spotify Top 5 Artists
+
+WITH artist_ranked AS (
+  SELECT 
+    a.artist_name,
+    DENSE_RANK() OVER(
+    ORDER BY count(*) DESC) AS artist_rank
+  FROM artists AS a
+  INNER JOIN songs AS s ON
+    a.artist_id = s.artist_id
+  INNER JOIN global_song_rank AS gsr ON
+    s.song_id = gsr.song_id
+  WHERE gsr.rank <= 10
+  GROUP BY a.artist_name
+)
+SELECT
+  artist_name,
+  artist_rank
+FROM artist_ranked
+WHERE artist_rank <= 5
+ORDER BY artist_rank;
