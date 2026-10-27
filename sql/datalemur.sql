@@ -205,3 +205,30 @@ SELECT
 FROM time_measurements
 GROUP BY measurement_day
 ORDER BY measurement_day;
+
+-- Wayfair Y-on-Y Growth Rate
+
+WITH spend_comp AS (
+  SELECT 
+    EXTRACT(YEAR FROM transaction_date) AS yr,
+    product_id,
+    SUM(spend) AS curr_year_spend, --ensures all spending in year is included
+    LAG(SUM(spend)) OVER(PARTITION BY product_id 
+      ORDER BY EXTRACT(YEAR FROM transaction_date)) 
+      AS prev_year_spend
+  FROM user_transactions
+  GROUP BY product_id, EXTRACT(YEAR from transaction_date)
+  )
+  -- Use the SUM() GROUP BY here instead of Windows.
+  -- Windows would create a running total using SUM() OVER(PARTITION BY)
+SELECT
+  yr,
+  product_id,
+  curr_year_spend,
+  prev_year_spend,
+  ROUND(((curr_year_spend - prev_year_spend) / 
+    NULLIF(prev_year_spend, 0)) * 100.0, 2)
+    AS yoy_rate
+FROM spend_comp
+ORDER BY product_id ASC, yr ASC;
+  -- Create variables in the CTE, then the calculations in the query for better readability
